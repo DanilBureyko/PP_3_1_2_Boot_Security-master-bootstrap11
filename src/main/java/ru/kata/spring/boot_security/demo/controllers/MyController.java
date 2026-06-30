@@ -21,9 +21,6 @@ public class MyController {
     private final UserServiceImp userService;
 
     @Autowired
-    private StringHttpMessageConverter stringHttpMessageConverter;
-
-    @Autowired
     private MyController(UserServiceImp userService) {
         this.userService = userService;
     }

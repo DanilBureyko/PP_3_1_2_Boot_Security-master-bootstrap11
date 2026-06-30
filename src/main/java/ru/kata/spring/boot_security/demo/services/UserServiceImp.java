@@ -13,17 +13,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.util.*;
 
-@Transactional
+
 @Service
 public class UserServiceImp implements UserDetailsService, UserService {
-    @PersistenceContext
-    private EntityManager em;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -48,20 +43,24 @@ public class UserServiceImp implements UserDetailsService, UserService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), grantedAuthorities);
     }
 
+    @Override
     public User findUserByName(String username) {
         User user = userRepository.findByUsername(username);
         return user;
     }
-
+    @Override
     public User findUserById(Long userId) {
         Optional<User> userFromDb = userRepository.findById(userId);
         return userFromDb.orElse(new User());
     }
 
+    @Override
     public List<User> allUsers() {
         return userRepository.findAll();
     }
 
+    @Transactional
+    @Override
     public boolean saveUser(User user) {
         if (user.getPassword().isEmpty()) {
             User userFromDb = userRepository.findById(user.getId()).get();
@@ -73,11 +72,8 @@ public class UserServiceImp implements UserDetailsService, UserService {
         return true;
     }
 
-    @Bean
-    public BCryptPasswordEncoder bbCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
+    @Transactional
+    @Override
     public boolean deleteUser(Long userId) {
         if (userRepository.findById(userId).isPresent()) {
             userRepository.deleteById(userId);
@@ -85,20 +81,9 @@ public class UserServiceImp implements UserDetailsService, UserService {
         }
         return false;
     }
-
-    public List<User> usergtList(Long idMin) {
-        return em.createQuery("SELECT u FROM User u WHERE u.id > :paramId", User.class)
-                .setParameter("paramId", idMin).getResultList();
-    }
-
+    @Override
     public List<Role> listRoles() {
         return roleRepository.findAll();
     }
 
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return em.createQuery("select u from User u where u.email =:email", User.class)
-                .setParameter("email", email)
-                .getResultStream().findAny();
-    }
 }

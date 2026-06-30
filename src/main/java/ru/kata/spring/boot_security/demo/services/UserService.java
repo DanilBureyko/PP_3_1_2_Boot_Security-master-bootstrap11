@@ -9,14 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    UserDetails loadUserByUsername(String username);
     User findUserByName(String username);
     User findUserById(Long userId);
     List<User> allUsers();
     boolean saveUser(User user);
     boolean deleteUser(Long userId);
-    List<User> usergtList(Long idMin);
     List<Role> listRoles();
-    BCryptPasswordEncoder bbCryptPasswordEncoder();
-    Optional<User> findByEmail(String email);
 }
